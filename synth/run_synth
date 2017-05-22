@@ -1,0 +1,8 @@
+rm -rf run.log
+source /tools/synopsys/synthesis/j201409/cshrc.syn
+dc_shell < ./scripts/dc_script.tcl | tee run.log
+mv *.log ./synth_out/logs/
+mv *.svf ./synth_out/svf/
+mv *.ddc ./synth_out/ddc/
+mv *.v   ./synth_out/netlist/
+mv *.sdc ./synth_out/constr/
