@@ -1,18 +1,30 @@
 module mpe(
-    input clk,
-    input rst,
-    input setup,
+    clk,
+    rst,
+    setup,
 
-    input [WORD_SZ - 1: 0] data_in1,
-    input [WORD_SZ - 1: 0] data_in2,
-    input [WORD_SZ - 1: 0] random_num_pack,     // Currently I am planning to use only 32 bits
+    data_in1,
+    data_in2,
+    random_num_pack,     // Currently I am planning to use only 32 bits
 
-    output reg [GENE_SZ - 1: 0] child_gene
+    child_gene
 );
 
 parameter WORD_SZ = 64;
 parameter GENE_SZ = 64;
 parameter ATTR_SZ = 8;
+
+
+input clk;
+input rst;
+input setup;
+
+input [WORD_SZ - 1: 0] data_in1;
+input [WORD_SZ - 1: 0] data_in2;
+input [WORD_SZ - 1: 0] random_num_pack;     // Currently I am planning to use only 32 bits
+
+output reg [GENE_SZ - 1: 0] child_gene;
+
 
 reg [GENE_SZ  -1 : 0]   gene1;                  //Parent Gene1
 reg [GENE_SZ  -1 : 0]   gene2;                  //Parent Gene2
@@ -60,23 +72,25 @@ wire [7:0] mutated_val_attr1;
 wire [7:0] mutated_val_attr2;
 wire [7:0] mutated_val_attr3;
 
+wire [127:0] tie_low;
+assign tie_low = 128'b0;
 // Setup logic
 always @(posedge clk, posedge rst)
 begin
     if(rst == 1'b1)
     begin
-        parent1_fitness         = (ATTR_SZ)'b0;
-        parent2_fitness         = (ATTR_SZ)'b0;
-        child_genome_id         = (ATTR_SZ)'b0;
-        mutation_prob_node_bias         = (ATTR_SZ)'b0;
-        mutation_prob_node_response     = (ATTR_SZ)'b0;
-        mutation_prob_node_activation   = (ATTR_SZ)'b0;
-        mutation_prob_node_aggregation  = (ATTR_SZ)'b0;
-        mutation_prob_conn_weight       = (ATTR_SZ)'b0;
-        mutation_prob_conn_enable       = (ATTR_SZ)'b0;
+        parent1_fitness         = tie_low[ATTR_SZ - 1: 0];
+        parent2_fitness         = tie_low[ATTR_SZ - 1: 0];
+        child_genome_id         = tie_low[ATTR_SZ - 1: 0];
+        mutation_prob_node_bias         = tie_low[ATTR_SZ - 1: 0];
+        mutation_prob_node_response     = tie_low[ATTR_SZ - 1: 0];
+        mutation_prob_node_activation   = tie_low[ATTR_SZ - 1: 0];
+        mutation_prob_node_aggregation  = tie_low[ATTR_SZ - 1: 0];
+        mutation_prob_conn_weight       = tie_low[ATTR_SZ - 1: 0];
+        mutation_prob_conn_enable       = tie_low[ATTR_SZ - 1: 0];
 
-        gene1   = (GENE_SZ)'b0;
-        gene2   = (GENE_SZ)'b0;
+        gene1   = tie_low[GENE_SZ - 1: 0];
+        gene2   = tie_low[GENE_SZ - 1: 0];
     end
     else
     begin
@@ -122,10 +136,10 @@ always @(posedge clk, posedge rst)
 begin
     if(rst == 1'b0)
     begin
-        random0 = (ATTR_SZ)'b0;
-        random1 = (ATTR_SZ)'b0;
-        random2 = (ATTR_SZ)'b0;
-        random3 = (ATTR_SZ)'b0;
+        random0 = tie_low[ATTR_SZ - 1: 0];
+        random1 = tie_low[ATTR_SZ - 1: 0];
+        random2 = tie_low[ATTR_SZ - 1: 0];
+        random3 = tie_low[ATTR_SZ - 1: 0];
     end
     else
     begin
@@ -161,40 +175,45 @@ always@(posedge clk, posedge rst)
 begin
     if(rst == 1'b1 || skip_crossover == 1'b1)
     begin
+        res_crossover[4*ATTR_SZ - 1: 0] = tie_low[4 * ATTR_SZ - 1 : 0];
     end
-        res_crossover[4*ATTR_SZ - 1: 0] = (4*ATTR_SZ)'b0;
     else
     begin
 
         if(sel_attr0 == 1'b0)
-            res_crossover[ATTR_SZ - 1: 0] = gene1[ATTR_SZ - 1: 0]
+            res_crossover[ATTR_SZ - 1: 0] = gene1[ATTR_SZ - 1: 0];
         else
-            res_crossover[ATTR_SZ - 1: 0] = gene2[ATTR_SZ - 1: 0]
+            res_crossover[ATTR_SZ - 1: 0] = gene2[ATTR_SZ - 1: 0];
 
         if(sel_attr1 == 1'b0)
-            res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene1[2*ATTR_SZ - 1: ATTR_SZ]
+            res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene1[2*ATTR_SZ - 1: ATTR_SZ];
         else
-            res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene2[2*ATTR_SZ - 1: ATTR_SZ]
+            res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene2[2*ATTR_SZ - 1: ATTR_SZ];
 
         if(sel_attr2 == 1'b0)
-            res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene1[3*ATTR_SZ - 1: 2* ATTR_SZ]
+            res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene1[3*ATTR_SZ - 1: 2* ATTR_SZ];
         else
-            res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene2[3*ATTR_SZ - 1: 2* ATTR_SZ]
+            res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene2[3*ATTR_SZ - 1: 2* ATTR_SZ];
 
         if(sel_attr3 == 1'b0)
-            res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene1[4*ATTR_SZ - 1: 3* ATTR_SZ]
+            res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene1[4*ATTR_SZ - 1: 3* ATTR_SZ];
         else
-            res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene2[4*ATTR_SZ - 1: 3* ATTR_SZ]
+            res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene2[4*ATTR_SZ - 1: 3* ATTR_SZ];
         end
 end
 
 // Combo logic for select generation for mutation
-assign gene_type = (crossover_sel_bias == 1'b0)? gene1[GENE_SZ - ATTR_SZ -1]
-                                                :gene2[GENE_SZ - ATTR_SZ -1]; //55th bit
+assign gene_type = (crossover_sel_bias == 1'b0)? gene1[GENE_SZ - ATTR_SZ -1] :gene2[GENE_SZ - ATTR_SZ -1]; //55th bit
 
+assign mutation_prob_attr0 = (gene_type == 1'b0)? mutation_prob_node_bias : mutation_prob_conn_weight;
+assign mutation_prob_attr1 = (gene_type == 1'b0)? mutation_prob_node_response : mutation_prob_conn_enable;
+assign mutation_prob_attr2 = (gene_type == 1'b0)? mutation_prob_node_activation : tie_low[ATTR_SZ -1];
+assign mutation_prob_attr3 = (gene_type == 1'b0)? mutation_prob_node_aggregation: tie_low[ATTR_SZ -1];
+
+/*
 always @(*)
 begin
-    if(gene_type = 1'b0)
+    if(gene_type == 1'b0)
     begin
         mutation_prob_attr0 = mutation_prob_node_bias;
         mutation_prob_attr1 = mutation_prob_node_response;
@@ -209,6 +228,7 @@ begin
         mutation_prob_attr3 = 8'b0;
     end
 end
+*/
 
 mutation_sel_gen mutation_sel_gen0( .random(random0),
                                     .mutation_prob(mutation_prob_attr0),
@@ -247,41 +267,41 @@ always @(posedge clk, posedge rst)
 begin
     if(rst == 1'b1 || skip_mutate == 1'b1)
     begin 
-        child_gene = (8*ATTR_SZ)'b0;
+        child_gene = tie_low[8*ATTR_SZ - 1 : 0];
     end
     else
     begin
         if(mutation_sel0 == 1'b1)
             child_gene[ATTR_SZ - 1 : 0] = mutated_val_attr0;
         else
-            child_gene[ATTR_SZ - 1 : 0] = res_crossover[ATTR_SZ - 1: 0]
+            child_gene[ATTR_SZ - 1 : 0] = res_crossover[ATTR_SZ - 1: 0];
 
         if(mutation_sel1 == 1'b1)
             child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = mutated_val_attr1;
         else
-            child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = res_crossover[2*ATTR_SZ - 1: ATTR_SZ]
+            child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = res_crossover[2*ATTR_SZ - 1: ATTR_SZ];
 
         if(mutation_sel2 == 1'b1)
             child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = mutated_val_attr2;
         else
-            child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ]
+            child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ];
 
         if(mutation_sel3 == 1'b1)
             child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = mutated_val_attr3;
         else
-            child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ]
+            child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ];
 
         if(crossover_sel_bias == 1'b0)
         begin
-            child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene1[5*ATTR_SZ - 1: 4*ATTR_SZ]
-            child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene1[6*ATTR_SZ - 1: 5*ATTR_SZ]
-            child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene1[7*ATTR_SZ - 1: 6*ATTR_SZ]
+            child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene1[5*ATTR_SZ - 1: 4*ATTR_SZ];
+            child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene1[6*ATTR_SZ - 1: 5*ATTR_SZ];
+            child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene1[7*ATTR_SZ - 1: 6*ATTR_SZ];
         end
         else
         begin
-            child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene2[5*ATTR_SZ - 1: 4*ATTR_SZ]
-            child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene2[6*ATTR_SZ - 1: 5*ATTR_SZ]
-            child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene2[7*ATTR_SZ - 1: 6*ATTR_SZ]
+            child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene2[5*ATTR_SZ - 1: 4*ATTR_SZ];
+            child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene2[6*ATTR_SZ - 1: 5*ATTR_SZ];
+            child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene2[7*ATTR_SZ - 1: 6*ATTR_SZ];
         end
 
         child_gene[8*ATTR_SZ - 1: 7*ATTR_SZ] = child_genome_id;
