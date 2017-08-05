@@ -1,5 +1,5 @@
 `include "./src/lane_stage0.v"
-`include "./src/misc_combo_logic.v"
+`include "./src/lane_mutations.v"
 
 module lane_del_node_conn(
     clk,
@@ -11,12 +11,12 @@ module lane_del_node_conn(
     conn_del_prob,
     random,
 
-    input_node_max,
-    input_node_min,
-    output_node_max,
-    output_node_min,
+    //input_node_max,
+    //input_node_min,
+    //output_node_max,
+    //output_node_min,
     hidden_node_max,
-    hidden_node_min,
+    //hidden_node_min,
 
     gene_out,
     out_valid
@@ -35,12 +35,12 @@ input [ATTR_SZ - 1 : 0] conn_del_prob;
 input [ATTR_SZ - 1 : 0] random;
 
 
-output [ATTR_SZ - 1 : 0] input_node_max;
-output [ATTR_SZ - 1 : 0] input_node_min;
-output [ATTR_SZ - 1 : 0] output_node_max;
-output [ATTR_SZ - 1 : 0] output_node_min;
+//output [ATTR_SZ - 1 : 0] input_node_max;
+//output [ATTR_SZ - 1 : 0] input_node_min;
+//output [ATTR_SZ - 1 : 0] output_node_max;
+//output [ATTR_SZ - 1 : 0] output_node_min;
 output [ATTR_SZ - 1 : 0] hidden_node_max;
-output [ATTR_SZ - 1 : 0] hidden_node_min;
+//output [ATTR_SZ - 1 : 0] hidden_node_min;
 
 output reg [GENE_SZ - 1 : 0] gene_out;
 output reg out_valid;

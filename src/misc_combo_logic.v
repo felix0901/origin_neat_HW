@@ -102,6 +102,7 @@ module mutate_val_gen_attr3(
 endmodule
 
 
+/*
 module del_list_node_match(
     src_node,
     dest_node, 
@@ -140,5 +141,5 @@ endgenerate
 assign match = ~&{match_bits_src, match_bits_dest};
 
 endmodule
-
+*/
 

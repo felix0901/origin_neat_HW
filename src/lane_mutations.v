@@ -77,6 +77,46 @@ end
 endmodule
 
 
+module del_list_node_match(
+    src_node,
+    dest_node, 
+    del_node_list,
+
+    match
+);
+parameter GENE_SZ = 64;
+parameter ATTR_SZ = 8;
+
+input [ATTR_SZ - 1: 0] src_node;
+input [ATTR_SZ - 1: 0] dest_node;
+input [GENE_SZ - 1: 0] del_node_list;
+
+output match;
+
+wire [(GENE_SZ / ATTR_SZ) - 1: 0] match_bits_src;
+wire [(GENE_SZ / ATTR_SZ) - 1: 0] match_bits_dest;
+
+genvar i;
+generate
+    for(i = 0; i < (GENE_SZ / ATTR_SZ); i = i+1)
+    begin
+        assign match_bits_src[i] = src_node ^ del_node_list[(i+1) * ATTR_SZ - 1: i* ATTR_SZ];
+    end
+endgenerate
+
+genvar j;
+generate
+    for(j = 0; j < (GENE_SZ / ATTR_SZ); j = j+1)
+    begin
+        assign match_bits_dest[j] = dest_node ^ del_node_list[(j+1) * ATTR_SZ - 1: j* ATTR_SZ];
+    end
+endgenerate
+
+assign match = ~&{match_bits_src, match_bits_dest};
+
+endmodule
+
+
 module add_conn_mutation(
     
 //    global_input_node_max,
