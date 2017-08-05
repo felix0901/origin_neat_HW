@@ -8,9 +8,7 @@ module lane_add_conn(
     state,
     gene_in,
     conn_add_prob,
-    random_1,
-    random_2,
-    random_3,
+    random,
     genome_id,
 
     //input_node_max,
@@ -33,9 +31,7 @@ input rst;
 input [1:0] state;
 input [GENE_SZ - 1 : 0] gene_in;
 input [ATTR_SZ - 1 : 0] conn_add_prob;
-input [ATTR_SZ - 1 : 0] random_1;
-input [ATTR_SZ - 1 : 0] random_2;
-input [ATTR_SZ - 1 : 0] random_3;
+input [ATTR_SZ - 1 : 0] random;
 input [ATTR_SZ - 1 : 0] genome_id;
 
 
@@ -108,7 +104,7 @@ begin
         end
         else if(state == 2'b10)
         begin
-            if((random_1 > conn_add_prob) && (next_flag == 1'b0))
+            if((random > conn_add_prob) && (next_flag == 1'b0))
             begin
                 gene_out1       = gene_in;
                 gene_out2       = tie_low[GENE_SZ - 1: 0];
