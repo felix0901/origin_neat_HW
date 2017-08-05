@@ -134,7 +134,7 @@ end
 // Fill the random number registers
 always @(posedge clk, posedge rst)
 begin
-    if(rst == 1'b0)
+    if(rst == 1'b1)
     begin
         random0 = tie_low[ATTR_SZ - 1: 0];
         random1 = tie_low[ATTR_SZ - 1: 0];
@@ -181,33 +181,39 @@ crossover_sel_gen sel3_gen( .bias(crossover_sel_bias),
 // Sequential logic for crossover
 always@(posedge clk, posedge rst)
 begin
-    if(rst == 1'b1 || skip_crossover == 1'b1)
+    if(rst == 1'b1)
     begin
         res_crossover[4*ATTR_SZ - 1: 0] = tie_low[4 * ATTR_SZ - 1 : 0];
     end
     else
     begin
-
-        if(sel_attr0 == 1'b0)
-            res_crossover[ATTR_SZ - 1: 0] = gene1[ATTR_SZ - 1: 0];
-        else
-            res_crossover[ATTR_SZ - 1: 0] = gene2[ATTR_SZ - 1: 0];
-
-        if(sel_attr1 == 1'b0)
-            res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene1[2*ATTR_SZ - 1: ATTR_SZ];
-        else
-            res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene2[2*ATTR_SZ - 1: ATTR_SZ];
-
-        if(sel_attr2 == 1'b0)
-            res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene1[3*ATTR_SZ - 1: 2* ATTR_SZ];
-        else
-            res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene2[3*ATTR_SZ - 1: 2* ATTR_SZ];
-
-        if(sel_attr3 == 1'b0)
-            res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene1[4*ATTR_SZ - 1: 3* ATTR_SZ];
-        else
-            res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene2[4*ATTR_SZ - 1: 3* ATTR_SZ];
+        if(skip_crossover == 1'b1)
+        begin
+            res_crossover[4*ATTR_SZ - 1: 0] = tie_low[4 * ATTR_SZ - 1 : 0];
         end
+        else
+        begin
+            if(sel_attr0 == 1'b0)
+                res_crossover[ATTR_SZ - 1: 0] = gene1[ATTR_SZ - 1: 0];
+            else
+                res_crossover[ATTR_SZ - 1: 0] = gene2[ATTR_SZ - 1: 0];
+
+            if(sel_attr1 == 1'b0)
+                res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene1[2*ATTR_SZ - 1: ATTR_SZ];
+            else
+                res_crossover[2*ATTR_SZ - 1: ATTR_SZ] = gene2[2*ATTR_SZ - 1: ATTR_SZ];
+
+            if(sel_attr2 == 1'b0)
+                res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene1[3*ATTR_SZ - 1: 2* ATTR_SZ];
+            else
+                res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ] = gene2[3*ATTR_SZ - 1: 2* ATTR_SZ];
+
+            if(sel_attr3 == 1'b0)
+                res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene1[4*ATTR_SZ - 1: 3* ATTR_SZ];
+            else
+                res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ] = gene2[4*ATTR_SZ - 1: 3* ATTR_SZ];
+        end
+    end
 end
 
 // Combo logic for select generation for mutation
@@ -273,46 +279,53 @@ mutate_val_gen_attr3 mval_gen3( .random(random3),
 
 always @(posedge clk, posedge rst)
 begin
-    if(rst == 1'b1 || skip_mutate == 1'b1)
+    if(rst == 1'b1)
     begin 
         child_gene = tie_low[8*ATTR_SZ - 1 : 0];
     end
     else
     begin
-        if(mutation_sel0 == 1'b1)
-            child_gene[ATTR_SZ - 1 : 0] = mutated_val_attr0;
-        else
-            child_gene[ATTR_SZ - 1 : 0] = res_crossover[ATTR_SZ - 1: 0];
-
-        if(mutation_sel1 == 1'b1)
-            child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = mutated_val_attr1;
-        else
-            child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = res_crossover[2*ATTR_SZ - 1: ATTR_SZ];
-
-        if(mutation_sel2 == 1'b1)
-            child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = mutated_val_attr2;
-        else
-            child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ];
-
-        if(mutation_sel3 == 1'b1)
-            child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = mutated_val_attr3;
-        else
-            child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ];
-
-        if(crossover_sel_bias == 1'b0)
+        if(skip_mutate == 1'b1)
         begin
-            child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene1[5*ATTR_SZ - 1: 4*ATTR_SZ];
-            child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene1[6*ATTR_SZ - 1: 5*ATTR_SZ];
-            child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene1[7*ATTR_SZ - 1: 6*ATTR_SZ];
+            child_gene = tie_low[8*ATTR_SZ - 1 : 0];
         end
         else
         begin
-            child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene2[5*ATTR_SZ - 1: 4*ATTR_SZ];
-            child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene2[6*ATTR_SZ - 1: 5*ATTR_SZ];
-            child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene2[7*ATTR_SZ - 1: 6*ATTR_SZ];
-        end
+            if(mutation_sel0 == 1'b1)
+                child_gene[ATTR_SZ - 1 : 0] = mutated_val_attr0;
+            else
+                child_gene[ATTR_SZ - 1 : 0] = res_crossover[ATTR_SZ - 1: 0];
 
-        child_gene[8*ATTR_SZ - 1: 7*ATTR_SZ] = child_genome_id;
+            if(mutation_sel1 == 1'b1)
+                child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = mutated_val_attr1;
+            else
+                child_gene[2*ATTR_SZ - 1 : ATTR_SZ] = res_crossover[2*ATTR_SZ - 1: ATTR_SZ];
+
+            if(mutation_sel2 == 1'b1)
+                child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = mutated_val_attr2;
+            else
+                child_gene[3*ATTR_SZ - 1 : 2* ATTR_SZ] = res_crossover[3*ATTR_SZ - 1: 2* ATTR_SZ];
+
+            if(mutation_sel3 == 1'b1)
+                child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = mutated_val_attr3;
+            else
+                child_gene[4*ATTR_SZ - 1 : 3* ATTR_SZ] = res_crossover[4*ATTR_SZ - 1: 3* ATTR_SZ];
+
+            if(crossover_sel_bias == 1'b0)
+            begin
+                child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene1[5*ATTR_SZ - 1: 4*ATTR_SZ];
+                child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene1[6*ATTR_SZ - 1: 5*ATTR_SZ];
+                child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene1[7*ATTR_SZ - 1: 6*ATTR_SZ];
+            end
+            else
+            begin
+                child_gene[5*ATTR_SZ - 1: 4*ATTR_SZ] = gene2[5*ATTR_SZ - 1: 4*ATTR_SZ];
+                child_gene[6*ATTR_SZ - 1: 5*ATTR_SZ] = gene2[6*ATTR_SZ - 1: 5*ATTR_SZ];
+                child_gene[7*ATTR_SZ - 1: 6*ATTR_SZ] = gene2[7*ATTR_SZ - 1: 6*ATTR_SZ];
+            end
+
+            child_gene[8*ATTR_SZ - 1: 7*ATTR_SZ] = child_genome_id;
+        end
     end
 end
 
