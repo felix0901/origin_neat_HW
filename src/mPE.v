@@ -156,18 +156,26 @@ assign crossover_sel_bias = (parent2_fitness > parent1_fitness)? 1'b1 : 1'b0;
 
 crossover_sel_gen sel0_gen( .bias(crossover_sel_bias),
                             .random(random0),
+                            .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
+                            .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr0));
 
 crossover_sel_gen sel1_gen( .bias(crossover_sel_bias),
                             .random(random1),
+                            .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
+                            .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr1));
 
 crossover_sel_gen sel2_gen( .bias(crossover_sel_bias),
                             .random(random2),
+                            .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
+                            .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr2));
 
 crossover_sel_gen sel3_gen( .bias(crossover_sel_bias),
                             .random(random3),
+                            .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
+                            .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr3));
 
 // Sequential logic for crossover
