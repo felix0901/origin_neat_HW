@@ -5,6 +5,7 @@ module del_node_conn(
     rst,
 
     state,
+    setup,
     gene_in,
     node_del_prob,
     conn_del_prob,
@@ -23,6 +24,7 @@ input clk;
 input rst;
 
 input state;
+input setup;
 input [GENE_SZ - 1 : 0] gene_in;
 input [ATTR_SZ - 1 : 0] node_del_prob;
 input [ATTR_SZ - 1 : 0] conn_del_prob;
@@ -41,6 +43,8 @@ wire [ATTR_SZ - 1 : 0] node_id;         // Will use this for node mutations
 wire [ATTR_SZ - 1 : 0] src_node_id;     // Will use this for conn mutations
 wire [ATTR_SZ - 1 : 0] dest_node_id;    // Will use this for conn mutations;
 
+reg [ATTR_SZ - 1: 0] node_del_prob_reg;
+reg [ATTR_SZ - 1: 0] conn_del_prob_reg;
 reg [ATTR_SZ - 1: 0] del_node_ctr;
 reg [GENE_SZ - 1: 0] del_node_list;
 
@@ -63,6 +67,26 @@ always @(posedge clk, posedge rst)
 begin
     if(rst == 1'b1)
     begin
+        node_del_prob_reg = tie_low[ATTR_SZ - 1: 0];
+        conn_del_prob_reg = tie_low[ATTR_SZ - 1: 0];
+    end
+    else
+    begin
+        if(setup == 1'b1)
+        begin
+            node_del_prob_reg = node_del_prob;
+            conn_del_prob_reg = conn_del_prob;
+        end
+    end
+end
+
+wire reset_datapath;
+assign reset_datapath = rst | setup;
+
+always @(posedge clk, posedge rst)
+begin
+    if(reset_datapath == 1'b1)
+    begin
         gene_out        = tie_low[GENE_SZ - 1: 0];
         del_node_list   = tie_low[GENE_SZ - 1: 0];
         del_node_ctr    = tie_low[ATTR_SZ - 1: 0];
@@ -73,7 +97,7 @@ begin
         if(state == 1'b0)
         //Node genes are being streamed
         begin
-            if((random > node_del_prob) && (del_node_ctr < LIM_DEL_NODE) && (node_type == 2'b00))
+            if((random > node_del_prob_reg) && (del_node_ctr < LIM_DEL_NODE) && (node_type == 2'b00))
             // Delete only is max is not filled and its hidden, should not
             // delete input or output node 
             begin
@@ -104,7 +128,7 @@ begin
         else if(state == 1'b1)
         //Connection genes are being streamed
         begin
-            if((del_node_match == 1'b1) || (random > conn_del_prob))
+            if((del_node_match == 1'b1) || (random > conn_del_prob_reg))
             begin
                 gene_out    = tie_low[GENE_SZ - 1: 0];
                 out_valid   = tie_low[0];

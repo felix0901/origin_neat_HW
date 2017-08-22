@@ -1,9 +1,9 @@
-`include "./src/crossover_perturb.v"
-`include "./src/check_max_node_id.v"
-`include "./src/del_node_conn.v"
-`include "./src/add_node_conn.v"
-`include "./src/misc_combo_logic.v"
-`include "./src/lane_mutations.v"
+//`include "./src/crossover_perturb.v"
+//`include "./src/check_max_node_id.v"
+//`include "./src/del_node_conn.v"
+//`include "./src/add_node_conn.v"
+//`include "./src/misc_combo_logic.v"
+//`include "./src/lane_mutations.v"
 
 module eve_pe(
     clk,
@@ -42,20 +42,25 @@ output [GENE_SZ - 1: 0]  gene_out3;
 output [2 : 0]  out_valid;
 
 
-reg  [ATTR_SZ - 1: 0]   hidden_node_max_reg;
 reg  [ATTR_SZ - 1: 0]   node_del_prob_reg;
 reg  [ATTR_SZ - 1: 0]   conn_del_prob_reg;
 reg  [ATTR_SZ - 1: 0]   node_add_prob_reg;
 reg  [ATTR_SZ - 1: 0]   conn_add_prob_reg;
 
+reg setup_stage1;     
+reg setup_stage2;     
+
 
 wire stage2_bypass_n;
+wire setup_stage0_out;
+wire inst_node_max_rst;
 
 wire [GENE_SZ - 1: 0]   stage1_gene_in;
 wire [GENE_SZ - 1: 0]   stage2_gene_in;
 wire [ATTR_SZ - 1: 0]   genome_id;
 wire [ATTR_SZ - 1: 0]   hidden_node_max_state0;
 wire [ATTR_SZ - 1: 0]   hidden_node_max_state1;
+wire [ATTR_SZ - 1: 0]   hidden_node_max_reg;
 
 wire [64 - 1: 0]   tie_low;
 wire [64 - 1: 0]   tie_high;
@@ -63,11 +68,12 @@ wire [64 - 1: 0]   tie_high;
 assign tie_low  = 64'b0;
 assign tie_high = 64'hFFFF_FFFF_FFFF_FFFF;
 
+assign hidden_node_max_reg = (state == 1'b0) ? hidden_node_max_state0 : hidden_node_max_state1;
+
 always @(posedge clk, posedge rst)
 begin
     if(rst == 1'b1)
     begin
-        hidden_node_max_reg = tie_low[ATTR_SZ - 1: 0];
         node_del_prob_reg = tie_low[ATTR_SZ - 1: 0];
         node_add_prob_reg = tie_low[ATTR_SZ - 1: 0];
         conn_del_prob_reg = tie_low[ATTR_SZ - 1: 0];
@@ -82,18 +88,20 @@ begin
             conn_add_prob_reg = data_in2[4* ATTR_SZ - 1: 3* ATTR_SZ];
             conn_del_prob_reg = data_in2[5* ATTR_SZ - 1: 4* ATTR_SZ];
         end
-        else
-        begin
-            if(state == 1'b0) 
-            begin
-                hidden_node_max_reg = hidden_node_max_state0;
-            end
-            else
-            begin
-                hidden_node_max_reg = hidden_node_max_state1;
-            end
-        end 
+    end
+end
 
+always @(posedge clk, posedge rst)
+begin
+    if(rst == 1'b1)
+    begin
+        setup_stage1 = 1'b0;
+        setup_stage2 = 1'b0;
+    end
+    else
+    begin
+        setup_stage1 = setup_stage0_out;
+        setup_stage2 = setup_stage1;
     end
 end
 
@@ -110,16 +118,20 @@ crossover_perturb #(
     .data_in2(data_in2),
     .random_num_pack(random_num_pack[WORD_SZ -1 : 0]),
 
+    .setup_out(setup_stage0_out),
     .child_genome_id(genome_id),
     .child_gene(stage1_gene_in)
 );
 
+//This should work functionally because setup will follow stage=1 
+//no one is using the max value from this reg in stage 1
+assign inst_node_max_rst = rst | setup;
 lane_stage0 #(
     .GENE_SZ(GENE_SZ),
     .ATTR_SZ(ATTR_SZ)
 ) inst_node_max(
     .clk(clk),
-    .rst(rst),
+    .rst(inst_node_max_rst),
 
     .state(state),
     .gene_in(stage1_gene_in),
@@ -136,6 +148,7 @@ del_node_conn #(
     .rst(rst),
 
     .state(state),
+    .setup(setup_stage1),
     .gene_in(stage1_gene_in),
     .node_del_prob(node_del_prob_reg),
     .conn_del_prob(conn_del_prob_reg),
@@ -145,7 +158,7 @@ del_node_conn #(
     .out_valid(stage2_bypass_n)
 );
 
-lane_add_node #(
+add_node_conn #(
     .GENE_SZ(GENE_SZ),
     .ATTR_SZ(ATTR_SZ)
 ) stage2(
@@ -153,6 +166,7 @@ lane_add_node #(
     .rst(rst),
 
     .state(state),
+    .setup(setup_stage2),
     .gene_in(stage2_gene_in),
     .node_add_prob(node_add_prob_reg),
     .conn_add_prob(conn_add_prob_reg),

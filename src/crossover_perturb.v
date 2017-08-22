@@ -10,6 +10,7 @@ module crossover_perturb(
     random_num_pack,     // Currently I am planning to use only 32 bits
 
     child_genome_id,
+    setup_out,
     child_gene
 );
 
@@ -26,6 +27,7 @@ input [GENE_SZ - 1: 0] data_in1;
 input [GENE_SZ - 1: 0] data_in2;
 input [WORD_SZ - 1: 0] random_num_pack;     // Currently I am planning to use only 32 bits
 
+output setup_out;
 output reg [ATTR_SZ - 1: 0] child_genome_id;
 output reg [GENE_SZ - 1: 0] child_gene;
 
@@ -132,6 +134,7 @@ begin
         skip_mutate    = skip_crossover;
     end
 end
+assign setup_out = skip_mutate;
 
 
 // Fill the random number registers
