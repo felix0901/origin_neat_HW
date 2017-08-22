@@ -107,7 +107,7 @@ end
 wire reset_datapath;
 assign reset_datapath = rst | setup;
 
-always @(posedge clk, posedge rst)
+always @(posedge clk, posedge reset_datapath)
 begin
     if(reset_datapath == 1'b1)
     begin
