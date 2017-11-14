@@ -1,8 +1,43 @@
-rm -rf run.log
+set synth_dir = "/usr/scratch/anand/neuroevol_verilog/synergylab_hwsynthesis"
+
+
+if (-e ./synth_out) then 
+    rm -rf synth_out_old
+    mv ./synth_out synth_out_old
+endif
 source /tools/synopsys/synthesis/j201409/cshrc.syn
-dc_shell < ./scripts/dc_script.tcl | tee run.log
+set cur_dir = `pwd`
+echo $cur_dir
+
+cd $synth_dir
+
+rm -rf file_list.tcl
+rm -rf variables.tcl
+rm -rf src 
+
+ln -s $cur_dir/file_list.tcl file_list.tcl
+ln -s $cur_dir/variables.tcl variables.tcl
+ln -s $cur_dir/../src src
+make dc
+
+if (-e ./synth_out) then
+    mv ./synth_out synth_out_old
+else
+    mkdir ./synth_out
+    mkdir ./synth_out/logs/
+    mkdir ./synth_out/svf/
+    mkdir ./synth_out/ddc/
+    mkdir ./synth_out/netlist/
+    mkdir ./synth_out/constr/
+endif
+
 mv *.log ./synth_out/logs/
 mv *.svf ./synth_out/svf/
 mv *.ddc ./synth_out/ddc/
 mv *.v   ./synth_out/netlist/
 mv *.sdc ./synth_out/constr/
+
+mv ./synth_out $cur_dir
+cd $cur_dir
+echo "Done!"
+
