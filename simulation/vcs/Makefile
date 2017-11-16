@@ -4,7 +4,7 @@ compile:
 	source /tools/synopsys/vcs/i201403/cshrc.vcs; \
 	mkdir sim; \
 	cd sim; \
-    vcs +v2k -debug_all -f ../filelist; \
+    vcs +v2k -debug_all -f ../filelist -sverilog; \
 	cd ..
 
 sim:
