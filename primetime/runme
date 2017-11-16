@@ -1,0 +1,9 @@
+if(-e ./reports) then
+    rm -rf old_reports
+    mv reports old_reports
+endif
+
+pt_shell -f prime_power.tcl | tee run.log
+
+mkdir reports
+mv *.rpt *.log reports

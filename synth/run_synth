@@ -1,5 +1,5 @@
 set synth_dir = "/usr/scratch/anand/neuroevol_verilog/synergylab_hwsynthesis"
-
+set top_level = "xorwow"
 
 if (-e ./synth_out) then 
     rm -rf synth_out_old
@@ -18,7 +18,8 @@ rm -rf src
 ln -s $cur_dir/file_list.tcl file_list.tcl
 ln -s $cur_dir/variables.tcl variables.tcl
 ln -s $cur_dir/../src src
-make dc
+
+make dc | tee run.log
 
 if (-e ./synth_out) then
     mv ./synth_out synth_out_old
@@ -36,8 +37,14 @@ mv *.svf ./synth_out/svf/
 mv *.ddc ./synth_out/ddc/
 mv *.v   ./synth_out/netlist/
 mv *.sdc ./synth_out/constr/
+mv rpt/  ./synth_out/
 
 mv ./synth_out $cur_dir
 cd $cur_dir
+
+cp ./synth_out/netlist/results_synthesized.v ../src/netlist/$top_level.v
+mv ./synth_out/constr/results_synthesized.sdc ./synth_out/constr/$top_level.sdc
+
+mv synth_out synth_results/$top_level
 echo "Done!"
 
