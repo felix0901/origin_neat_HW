@@ -1,36 +1,27 @@
 //`include "./src/misc_combo_logic.v"
 
-module crossover_perturb(
-    clk,
-    rst,
-    setup,
+module crossover_perturb
+#(
+parameter WORD_SZ = 32,
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
+input clk,
+input rst,
+input setup,
+input bubble,
+input bias_ext,
 
-    data_in1,
-    data_in2,
-    random_num_pack,     // Currently I am planning to use only 32 bits
+input [GENE_SZ - 1: 0] data_in1,
+input [GENE_SZ - 1: 0] data_in2,
+input [GENE_SZ - 1: 0] gene1_in,
+input [GENE_SZ - 1: 0] gene2_in,
+input [WORD_SZ - 1: 0] random_num_pack,     // Currently I am planning to use only 32 bits
 
-    child_genome_id,
-    setup_out,
-    child_gene
+output setup_out,
+output reg [ATTR_SZ - 1: 0] child_genome_id,
+output reg [GENE_SZ - 1: 0] child_gene
 );
-
-parameter WORD_SZ = 32;
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-
-input clk;
-input rst;
-input setup;
-
-input [GENE_SZ - 1: 0] data_in1;
-input [GENE_SZ - 1: 0] data_in2;
-input [WORD_SZ - 1: 0] random_num_pack;     // Currently I am planning to use only 32 bits
-
-output setup_out;
-output reg [ATTR_SZ - 1: 0] child_genome_id;
-output reg [GENE_SZ - 1: 0] child_gene;
-
 
 reg [GENE_SZ  -1 : 0]   gene1;                  //Parent Gene1
 reg [GENE_SZ  -1 : 0]   gene2;                  //Parent Gene2
@@ -114,12 +105,16 @@ begin
         end
         else
         begin
-            gene1 = data_in1;
-            gene2 = data_in2;
+            //gene1 = data_in1;
+            //gene2 = data_in2;
+            gene1 = gene1_in;
+            gene2 = gene2_in;
         end
     end
 end
 
+wire bubble_insertion;
+assign bubble_insertion = setup | bubble;
 //Skip register shifting
 always @(posedge clk, posedge rst)
 begin
@@ -130,7 +125,8 @@ begin
     end
     else
     begin
-        skip_crossover = setup;
+        //skip_crossover = setup;
+        skip_crossover = bubble_insertion;
         skip_mutate    = skip_crossover;
     end
 end
@@ -158,31 +154,36 @@ end
 
 
 //Select generation for crossover
-assign crossover_sel_bias = (parent2_fitness > parent1_fitness)? 1'b1 : 1'b0;
+//assign crossover_sel_bias = (parent2_fitness > parent1_fitness)? 1'b1 : 1'b0;
 
-crossover_sel_gen sel0_gen( .bias(crossover_sel_bias),
+//crossover_sel_gen sel0_gen( .bias(crossover_sel_bias),
+crossover_sel_gen sel0_gen( .bias(bias_ext),
                             .random(random0),
                             .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr0));
 
-crossover_sel_gen sel1_gen( .bias(crossover_sel_bias),
+//crossover_sel_gen sel1_gen( .bias(crossover_sel_bias),
+crossover_sel_gen sel1_gen( .bias(bias_ext),
                             .random(random1),
                             .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr1));
 
-crossover_sel_gen sel2_gen( .bias(crossover_sel_bias),
+//crossover_sel_gen sel2_gen( .bias(crossover_sel_bias),
+crossover_sel_gen sel2_gen( .bias(bias_ext),
                             .random(random2),
                             .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr2));
 
-crossover_sel_gen sel3_gen( .bias(crossover_sel_bias),
+//crossover_sel_gen sel3_gen( .bias(crossover_sel_bias),
+crossover_sel_gen sel3_gen( .bias(bias_ext),
                             .random(random3),
                             .gene1_key(gene1[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .gene2_key(gene2[7*ATTR_SZ - 1: 5*ATTR_SZ]),
                             .sel(sel_attr3));
+
 
 // Sequential logic for crossover
 always@(posedge clk, posedge rst)

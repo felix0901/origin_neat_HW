@@ -1,38 +1,26 @@
 //`include "./src/lane_mutations.v"
 
-module del_node_conn(
-    clk,
-    rst,
+module del_node_conn
+#(
 
-    state,
-    setup,
-    gene_in,
-    node_del_prob,
-    conn_del_prob,
-    random,
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8,
+parameter LIM_DEL_NODE = 8 // Should not exceed 8
+)(
 
-    gene_out,
-    out_valid
+input clk,
+input rst,
+
+input state,
+input setup,
+input [GENE_SZ - 1 : 0] gene_in,
+input [ATTR_SZ - 1 : 0] node_del_prob,
+input [ATTR_SZ - 1 : 0] conn_del_prob,
+input [ATTR_SZ - 1 : 0] random,
+
+output reg [GENE_SZ - 1 : 0] gene_out,
+output reg out_valid
 );
-
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-parameter LIM_DEL_NODE = 8; // Should not exceed 8
-
-
-input clk;
-input rst;
-
-input state;
-input setup;
-input [GENE_SZ - 1 : 0] gene_in;
-input [ATTR_SZ - 1 : 0] node_del_prob;
-input [ATTR_SZ - 1 : 0] conn_del_prob;
-input [ATTR_SZ - 1 : 0] random;
-
-output reg [GENE_SZ - 1 : 0] gene_out;
-output reg out_valid;
-
 
 wire [63 : 0] tie_low;
 wire [63 : 0] tie_high;

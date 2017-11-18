@@ -1,15 +1,9 @@
 module xorwow(
-    clk, 
-    rst,
+input clk,
+input rst,
 
-    random
+output reg [31:0] random
 );
-
-input clk;
-input rst;
-
-output reg [31:0] random;
-
 reg [31:0]  x;
 reg [31:0]  y;
 reg [31:0]  z;

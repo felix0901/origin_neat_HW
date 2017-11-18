@@ -1,30 +1,22 @@
-`include "./src/circ_q.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/circ_q.v"
 
-module pe_front_end(
-    clk,
-    rst,
+module pe_front_end
+#(
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
+input clk,
+input rst,
 
-    gene1_in,
-    gene2_in,
+output reg bubble,
+output reg bias,
 
-    gene1_out,
-    gene2_out,
+input [GENE_SZ -1: 0] gene1_in,
+input [GENE_SZ -1: 0] gene2_in,
+
+output reg [GENE_SZ -1: 0] gene1_out,
+output reg [GENE_SZ -1: 0] gene2_out
 );
-
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-input clk;
-input rst;
-
-input [GENE_SZ -1: 0] gene1_in;
-input [GENE_SZ -1: 0] gene2_in;
-
-output reg [GENE_SZ -1: 0] gene1_out;
-output reg [GENE_SZ -1: 0] gene2_out;
-
-reg [GENE_SZ - 1: 0] gene1_buf;
-reg [GENE_SZ - 1: 0] gene2_buf;
 
 wire [GENE_SZ - 1: 0] tie_low;
 
@@ -81,6 +73,14 @@ always @(posedge clk)
 begin 
     if(rst == 1'b1)
     begin
+        gene1_out = tie_low;
+        gene2_out = tie_low;
+
+        gene1_rd = 1'b1;
+        gene2_rd = 1'b1;
+        
+        bubble = 1'b1;
+        bias = 1'b0;
     end
     begin
         if (gene1_src1 == gene2_src1)
@@ -90,6 +90,9 @@ begin
                 gene1_out = gene1_q_out;
                 gene2_out = gene2_q_out;
 
+                bubble = 1'b0;
+                bias = 1'b0;
+
                 gene1_rd = 1'b1;
                 gene2_rd = 1'b1;
             end
@@ -97,6 +100,9 @@ begin
             begin
                 gene1_out = gene1_q_out;
                 gene2_out = tie_low;
+
+                bubble = 1'b0;
+                bias = 1'b1;
 
                 gene1_rd = 1'b1;
                 gene2_rd = 1'b0;
@@ -106,6 +112,9 @@ begin
                 gene2_out = tie_low;
                 gene1_out = tie_low;
 
+                bubble = 1'b1;
+                bias = 1'b0;
+
                 gene2_rd = 1'b1;
                 gene1_rd = 1'b0;
             end
@@ -114,6 +123,9 @@ begin
         begin
             gene1_out = gene1_q_out;
             gene2_out = tie_low;
+                
+            bubble = 1'b0;
+            bias = 1'b1;
 
             gene1_rd = 1'b1;
             gene2_rd = 1'b0;
@@ -122,6 +134,9 @@ begin
         begin
             gene1_out = tie_low;
             gene2_out = tie_low;
+                
+            bubble = 1'b1;
+            bias = 1'b0;
 
             gene1_rd = 1'b0;
             gene2_rd = 1'b1;

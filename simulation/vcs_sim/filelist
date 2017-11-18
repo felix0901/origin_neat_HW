@@ -1,2 +1,2 @@
 #/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/test_bench/circ_q_tb.v
-/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/test_bench/xorwow_tb.v
+/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/testbench/xorwow_tb.v

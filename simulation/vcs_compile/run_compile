@@ -1,0 +1,10 @@
+source /tools/synopsys/vcs/i201403/cshrc.vcs
+mkdir sim
+cd sim
+vcs +v2k -debug_all -f ../filelist -sverilog | tee run.log
+cd ..
+
+if (-e output) then
+    rm -rf output
+endif
+mv sim output

@@ -17,15 +17,17 @@ module crossover_sel_gen(
     // Combo logic for comparator
     always @(*)
     begin
-        if(gene1_key == gene2_key)
+        //if(gene1_key == gene2_key)
+        if(bias == 1'b0)
         begin 
             if(random > half)
-                sel = ~bias;
+                //sel = ~bias ;
+                sel = 1'b1;
             else
-                sel = bias;
+                sel = 1'b0;
         end
         else
-            sel = bias;
+            sel = 1'b0;
     
     end
 endmodule

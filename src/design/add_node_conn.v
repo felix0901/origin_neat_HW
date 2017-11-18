@@ -1,50 +1,31 @@
 //`include "./src/lane_mutations.v"
 
-module add_node_conn(
-    clk,
-    rst,
+module add_node_conn
+#(
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
+input clk,
+input rst,
 
-    state,
-    setup,
-    gene_in,
-    node_add_prob,
-    conn_add_prob,
-    random,
-    genome_id,
+input state,
+input setup,
+input [GENE_SZ - 1 : 0] gene_in,
+input [ATTR_SZ - 1 : 0] node_add_prob,
+input [ATTR_SZ - 1 : 0] conn_add_prob,
+input [ATTR_SZ - 1 : 0] random,
+input [ATTR_SZ - 1 : 0] genome_id,
 
-    global_hidden_node_max,
-    
-    hidden_node_max,
 
-    gene_out1,
-    gene_out2,
-    gene_out3,
-    out_valid
+input [ATTR_SZ - 1 : 0] global_hidden_node_max,
+
+output reg [ATTR_SZ - 1 : 0] hidden_node_max,
+
+output reg [GENE_SZ - 1 : 0] gene_out1,
+output reg [GENE_SZ - 1 : 0] gene_out2,
+output reg [GENE_SZ - 1 : 0] gene_out3,
+output reg [2 : 0] out_valid
 );
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-input clk;
-input rst;
-
-input state;
-input setup;
-input [GENE_SZ - 1 : 0] gene_in;
-input [ATTR_SZ - 1 : 0] node_add_prob;
-input [ATTR_SZ - 1 : 0] conn_add_prob;
-input [ATTR_SZ - 1 : 0] random;
-input [ATTR_SZ - 1 : 0] genome_id;
-
-
-input [ATTR_SZ - 1 : 0] global_hidden_node_max;
-
-output reg [ATTR_SZ - 1 : 0] hidden_node_max;
-
-output reg [GENE_SZ - 1 : 0] gene_out1;
-output reg [GENE_SZ - 1 : 0] gene_out2;
-output reg [GENE_SZ - 1 : 0] gene_out3;
-output reg [2 : 0] out_valid;
-
 
 reg next_flag;
 reg [ATTR_SZ - 1: 0] src_reg;

@@ -1,25 +1,17 @@
-module lane_stage0(
-    clk,
-    rst,
+module lane_stage0
+#(
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
 
-    state,
-    gene_in,
-    
-    hidden_node_max
+input clk,
+input rst,
+
+input state,
+input [GENE_SZ - 1 : 0] gene_in,
+
+output reg [ATTR_SZ - 1 : 0] hidden_node_max
 );
-
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-
-input clk;
-input rst;
-
-input state;
-input [GENE_SZ - 1 : 0] gene_in;
-
-output reg [ATTR_SZ - 1 : 0] hidden_node_max;
-
 
 wire [63 : 0] tie_low;
 wire [63 : 0] tie_high;

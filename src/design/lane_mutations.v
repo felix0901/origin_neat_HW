@@ -1,22 +1,15 @@
-module add_node_mutation(
-    max_node_id,
-    gene_in,
+module add_node_mutation
+#(
+parameter ATTR_SZ = 8,
+parameter GENE_SZ = 64
+)(
+input [ATTR_SZ - 1 : 0] max_node_id,
+input [GENE_SZ - 1 : 0] gene_in,
 
-    node_gene_out,
-    conn1_gene_out,
-    conn2_gene_out
+output reg [GENE_SZ - 1 : 0] node_gene_out,
+output reg [GENE_SZ - 1 : 0] conn1_gene_out,
+output reg [GENE_SZ - 1 : 0] conn2_gene_out
 );
-
-parameter ATTR_SZ = 8;
-parameter GENE_SZ = 64;
-
-input [ATTR_SZ - 1 : 0] max_node_id;
-input [GENE_SZ - 1 : 0] gene_in;
-
-output reg [GENE_SZ - 1 : 0] node_gene_out;
-output reg [GENE_SZ - 1 : 0] conn1_gene_out;
-output reg [GENE_SZ - 1 : 0] conn2_gene_out;
-
 
 wire [63 : 0] tie_low;
 wire [ATTR_SZ - 1 : 0] genome_id;
@@ -77,22 +70,17 @@ end
 endmodule
 
 
-module del_list_node_match(
-    src_node,
-    dest_node, 
-    del_node_list,
+module del_list_node_match
+#(
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
+input [ATTR_SZ - 1: 0] src_node,
+input [ATTR_SZ - 1: 0] dest_node,
+input [GENE_SZ - 1: 0] del_node_list,
 
-    match
+output match
 );
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-input [ATTR_SZ - 1: 0] src_node;
-input [ATTR_SZ - 1: 0] dest_node;
-input [GENE_SZ - 1: 0] del_node_list;
-
-output match;
-
 wire [(GENE_SZ / ATTR_SZ) - 1: 0] match_bits_src;
 wire [(GENE_SZ / ATTR_SZ) - 1: 0] match_bits_dest;
 
@@ -117,41 +105,18 @@ assign match = ~&{match_bits_src, match_bits_dest};
 endmodule
 
 
-module add_conn_mutation(
-    
-//    global_input_node_max,
-//    global_input_node_min,
-//    global_output_node_max,
-//    global_output_node_min,
-//    global_hidden_node_max,
-//    global_hidden_node_min,
+module add_conn_mutation
+#(
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
 
-    genome_id,
-//    random1,
-//    random2,
+input [ATTR_SZ - 1 : 0] genome_id,
 
-    new_node_gene,
-    new_conn1_gene,
-    new_conn2_gene
+output reg [GENE_SZ - 1 : 0] new_node_gene,
+output reg [GENE_SZ - 1 : 0] new_conn1_gene,
+output reg [GENE_SZ - 1 : 0] new_conn2_gene
 );
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-//input [ATTR_SZ - 1 : 0] global_input_node_max;
-//input [ATTR_SZ - 1 : 0] global_input_node_min;
-//input [ATTR_SZ - 1 : 0] global_output_node_max;
-//input [ATTR_SZ - 1 : 0] global_output_node_min;
-//input [ATTR_SZ - 1 : 0] global_hidden_node_max;
-//input [ATTR_SZ - 1 : 0] global_hidden_node_min;
-
-input [ATTR_SZ - 1 : 0] genome_id;
-//input [ATTR_SZ - 1 : 0] random1;
-//input [ATTR_SZ - 1 : 0] random2;
-
-output reg [GENE_SZ - 1 : 0] new_node_gene;
-output reg [GENE_SZ - 1 : 0] new_conn1_gene;
-output reg [GENE_SZ - 1 : 0] new_conn2_gene;
-
 wire [ATTR_SZ - 1: 0] src;
 wire [ATTR_SZ - 1: 0] dest;
 

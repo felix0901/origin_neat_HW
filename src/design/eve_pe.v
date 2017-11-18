@@ -1,46 +1,34 @@
-`include "./crossover_perturb.v"
-`include "./check_max_node_id.v"
-`include "./del_node_conn.v"
-`include "./add_node_conn.v"
-`include "./misc_combo_logic.v"
-`include "./lane_mutations.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/crossover_perturb.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/check_max_node_id.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/del_node_conn.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/add_node_conn.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/misc_combo_logic.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/lane_mutations.v"
+//`include "/usr/scratch/anand/neuroevol_verilog/neat_hardware/src/design/pe_front_end.v"
 
-module eve_pe(
-    clk,
-    rst,
-    setup,
-    state,
+module eve_pe
+#(
+parameter WORD_SZ = 32,
+parameter GENE_SZ = 64,
+parameter ATTR_SZ = 8
+)(
+input clk,
+input rst,
+input setup,
 
-    data_in1,
-    data_in2,
-    random_num_pack,
+input state,
+input [GENE_SZ - 1: 0]  data_in1,
+input [GENE_SZ - 1: 0]  data_in2,
+input [GENE_SZ - 1: 0]  gene_in1,
+input [GENE_SZ - 1: 0]  gene_in2,
+input [GENE_SZ - 1: 0]  random_num_pack,
 
-    gene_out1,
-    gene_out2,
-    gene_out3,
+output [GENE_SZ - 1: 0]  gene_out1,
+output [GENE_SZ - 1: 0]  gene_out2,
+output [GENE_SZ - 1: 0]  gene_out3,
 
-    out_valid
+output [2 : 0]  out_valid
 );
-
-parameter WORD_SZ = 32;
-parameter GENE_SZ = 64;
-parameter ATTR_SZ = 8;
-
-input clk;
-input rst; 
-input setup;
-
-input state;
-input [GENE_SZ - 1: 0]  data_in1;
-input [GENE_SZ - 1: 0]  data_in2;
-input [GENE_SZ - 1: 0]  random_num_pack;
-
-output [GENE_SZ - 1: 0]  gene_out1;
-output [GENE_SZ - 1: 0]  gene_out2;
-output [GENE_SZ - 1: 0]  gene_out3;
-
-output [2 : 0]  out_valid;
-
 
 reg  [ATTR_SZ - 1: 0]   node_del_prob_reg;
 reg  [ATTR_SZ - 1: 0]   conn_del_prob_reg;
@@ -105,6 +93,25 @@ begin
     end
 end
 
+wire bubble;
+wire bias_ext;
+wire [GENE_SZ - 1: 0] gene1_stg0;
+wire [GENE_SZ - 1: 0] gene2_stg0;
+
+pe_front_end #(
+    .GENE_SZ(GENE_SZ),
+    .ATTR_SZ(ATTR_SZ)
+) front_end(
+    .clk(clk),
+    .rst(rst),
+    .gene1_in(gene_in1),
+    .gene2_in(gene_in2),
+    .bubble(bubble),
+    .bias(bias_ext),
+    .gene1_out(gene1_stg0),
+    .gene2_out(gene2_stg0)
+);
+
 crossover_perturb #(
     .WORD_SZ(WORD_SZ),
     .GENE_SZ(GENE_SZ),
@@ -113,9 +120,13 @@ crossover_perturb #(
     .clk(clk),
     .rst(rst),
     .setup(setup),
+    .bubble(bubble),
+    .bias_ext(bias_ext),
 
     .data_in1(data_in1),
     .data_in2(data_in2),
+    .gene1_in(gene1_stg0),
+    .gene2_in(gene2_stg0),
     .random_num_pack(random_num_pack[WORD_SZ -1 : 0]),
 
     .setup_out(setup_stage0_out),
